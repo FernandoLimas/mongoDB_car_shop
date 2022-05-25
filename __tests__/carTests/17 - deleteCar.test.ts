@@ -23,7 +23,7 @@ describe('17 - Crie uma rota para o endpoint /cars/id para excluir os registros 
   it('É disparado o erro 404 "Object not found" caso o id possua 24 caracteres mas é inválido', async () => {
     const errorMsg = { error: "Object not found" };
     const response = await request(server.getApp())
-      .put('/cars/999999999999999999999999')
+      .del('/cars/999999999999999999999999')
       .send(carMock.validCar);
 
     expect(response.status).toBe(404);
@@ -33,7 +33,7 @@ describe('17 - Crie uma rota para o endpoint /cars/id para excluir os registros 
   it('É disparado o erro 400 "Id must have 24 hexadecimal characters" caso o id possua menos que 24 caracteres', async () => {
     const errorMsg = { error: "Id must have 24 hexadecimal characters" }
     const response = await request(server.getApp())
-      .put('/cars/99999')
+      .del('/cars/99999')
       .send(carMock.validCar);
     expect(response.status).toBe(400);
     expect(response.body.error).toBe(errorMsg.error);
