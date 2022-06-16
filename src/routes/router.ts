@@ -16,6 +16,7 @@ class CarsRouter<T> {
     this.router.get(route, controller.getAll);
     this.router.get(`${route}/:id`, controller.getById);
     this.router.put(`${route}/:id`, controller.update);
+    this.router.delete(`${route}/:id`, controller.delete);
   }
 }
 
