@@ -23,6 +23,10 @@ abstract class Service<T> {
   public async update(id: string, body: T): Promise<T | null | ServiceError> {
     return this.model.update(id, body);
   }
+
+  public async delete(id: string): Promise<T | null | ServiceError> {
+    return this.model.delete(id);
+  }
 }
 
 export default Service;
