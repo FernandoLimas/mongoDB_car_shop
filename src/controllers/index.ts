@@ -12,7 +12,7 @@ export interface RequestWithBody<T> extends Request {
 enum ControllerErrors {
   internal = 'Internal Server Error',
   notFound = 'Object not found',
-  requiredId = 'Id is required',
+  requiredId = 'Id must have 24 hexadecimal characters',
   badRequest = 'Bad request',
 }
 
@@ -30,6 +30,11 @@ abstract class Controller<T> {
 
   abstract getAll(
     req: Request, res: Response<T[] | ResponseError>): Promise<typeof res>;
+
+  abstract getById(
+    req: RequestWithBody<T>,
+    res: Response<T | ResponseError>,
+  ): Promise<typeof res>;
 }
 
 export default Controller;
