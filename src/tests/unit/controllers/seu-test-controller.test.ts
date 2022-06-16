@@ -1,19 +1,19 @@
-import Sinon from 'sinon';
 import mongoose from 'mongoose';
+import Sinon from 'sinon';
 import chaiHttp = require('chai-http');
 import chai from 'chai';
 import server from '../../../server';
 import { Car } from '../../../interfaces/CarInterface';
+import { Motorcycle } from '../../../interfaces/MotorcycleInterface';
 import { carMock, newCarMock } from '../helpers/carMock'
 import CarModel from '../../../models/CarModel';
 import MotorcycleModel from '../../../models/MotoModel';
-import { Motorcycle } from '../../../interfaces/MotorcycleInterface';
 import { newMotorcycleMock, oneMotorcycleMock } from '../helpers/motoMock';
 chai.use(chaiHttp);
 
 const { expect } = chai;
 
-describe('CONTROLLER LAYER', () => {
+describe('Test controler', () => {
 	before(function() {
 		mongoose.createConnection('mongodb://mongodb:27017/CarShop');
 	});
@@ -25,7 +25,7 @@ describe('CONTROLLER LAYER', () => {
 	server.startServer();
 
 	const app = server.getApp();
-	describe('Testa CarController', () => {
+	describe('Testa server', () => {
 		let carModel = new CarModel();
 	
 		const updatedCar: Car = {
@@ -36,8 +36,53 @@ describe('CONTROLLER LAYER', () => {
 			"seatsQty": 4,
 			"doorsQty": 4
 		}
-		describe('create()', () => {
-			it('Testa se a requisição POST para a rota /cars retorna status 201', async ()=> {
+
+    describe('Getall', () => {
+      it('Retorna um array', async ()=> {
+        const response = await chai.request(app)
+        .get('/cars')
+    
+        expect(response.body).to.be.an('array');
+      });
+
+			it('Router GET cars status(200)', async ()=> {
+				const response = await chai.request(app)
+				.get('/cars')
+	
+				expect(response.status).to.be.equal(200);
+			});
+	
+	
+			it('Item do array é um objeto', async ()=> {
+				const response = await chai.request(app)
+				.get('/cars')
+	
+				const getAllCars = response.body;
+	
+				getAllCars.forEach((car: Car) => {
+					expect(car).to.be.an('object');
+				});
+			});
+	
+			it('Testa propriedades do objeto', async ()=> {
+				const response = await chai.request(app)
+				.get('/cars')
+	
+				const getAllCars = response.body;
+	
+				getAllCars.forEach((car: Car) => {
+					expect(car).to.have.property('model');
+					expect(car).to.have.property('year');
+					expect(car).to.have.property('buyValue');
+					expect(car).to.have.property('doorsQty');
+					expect(car).to.have.property('color');
+					expect(car).to.have.property('seatsQty');
+				});
+			});
+		})
+
+		describe('Testa create', () => {
+			it('Testa rota POST statu(201)', async ()=> {
 				const response = await chai.request(app)
 				.post('/cars')
 				.send(newCarMock)
@@ -45,7 +90,7 @@ describe('CONTROLLER LAYER', () => {
 				expect(response.status).to.be.equal(201);
 			});
 	
-			it('Testa se a requisição retorna um objeto', async ()=> {
+			it('Retorna um objeto', async ()=> {
 				const response = await chai.request(app)
 				.post('/cars')
 				.send(newCarMock)
@@ -69,50 +114,8 @@ describe('CONTROLLER LAYER', () => {
 				expect(newCar).to.have.property('_id');
 			});
 		})
-		describe('read()', () => {
-			it('Testa se a requisição GET para a rota /cars retorna status 200', async ()=> {
-				const response = await chai.request(app)
-				.get('/cars')
 	
-				expect(response.status).to.be.equal(200);
-			});
-	
-			it('Testa se a requisição retorna um array', async ()=> {
-				const response = await chai.request(app)
-				.get('/cars')
-		
-				expect(response.body).to.be.an('array');
-			});
-	
-			it('Testa se cada tem do array é um objeto', async ()=> {
-				const response = await chai.request(app)
-				.get('/cars')
-	
-				const allCars = response.body;
-	
-				allCars.forEach((car: Car) => {
-					expect(car).to.be.an('object');
-				});
-			});
-	
-			it('Testa se cada objeto tem as propriedades devidas', async ()=> {
-				const response = await chai.request(app)
-				.get('/cars')
-	
-				const allCars = response.body;
-	
-				allCars.forEach((car: Car) => {
-					expect(car).to.have.property('model');
-					expect(car).to.have.property('year');
-					expect(car).to.have.property('color');
-					expect(car).to.have.property('buyValue');
-					expect(car).to.have.property('seatsQty');
-					expect(car).to.have.property('doorsQty');
-				});
-			});
-		})
-	
-		describe('readOne()', () => {
+		describe('testa readOne', () => {
 			let mocks: any;
 			before(async () => {
 				Sinon
@@ -134,20 +137,21 @@ describe('CONTROLLER LAYER', () => {
 				(carModel.readOne as Sinon.SinonStub).restore();
 			});
 	
-			describe('SUCESSO', () => {
-				it('Testa se a requisição GET para a rota /cars/:id retorna status 200',  async ()=> {
+			describe('Test router getById', () => {
+        it('Retorna um objeto', async ()=> {
+          const response = await chai.request(app)
+          .get(`/cars/${mocks[0]._id}`)
+      
+          expect(response.body).to.be.an('object');
+        });
+
+				it('Rota /cars/:id retorna status(200)',  async ()=> {
 					const response = await chai.request(app)
 						.get(`/cars/${mocks[0]._id}`)
 					
 					expect(response.status).to.be.equal(200);
 				});
 		
-				it('Testa se a requisição retorna um objeto', async ()=> {
-					const response = await chai.request(app)
-					.get(`/cars/${mocks[0]._id}`)
-			
-					expect(response.body).to.be.an('object');
-				});
 		
 				it('Testa o objeto tem as propriedades devidas', async ()=> {
 					const response = await chai.request(app)
@@ -162,8 +166,15 @@ describe('CONTROLLER LAYER', () => {
 					expect(response.body).to.have.property('doorsQty');
 				});
 			})
-			describe('FALHA', () => {
-				it('Testa se a requisição retorna erro 400 caso o id não tenha formato hexadecimal', async ()=> {
+			describe('Test Error', () => {
+        it('Retorna status(404)', async ()=> {
+          const response = await chai.request(app)
+          .get(`/cars/1111111b111111f1114111f1`)
+          
+          expect(response.body.error).to.be
+          .equal("Object not found");
+        });
+				it('Retorna status(400) caso o id não tenha formato hexadecimal', async ()=> {
 					const response = await chai.request(app)
 					.get(`/cars/1`)
 			
@@ -171,16 +182,9 @@ describe('CONTROLLER LAYER', () => {
 					.equal("Id must have 24 hexadecimal characters");
 				});
 	
-				it('Testa se a requisição retorna erro 404 caso o id não seja encontrado', async ()=> {
-					const response = await chai.request(app)
-					.get(`/cars/1111111b111111f1114111f1`)
-					
-					expect(response.body.error).to.be
-					.equal("Object not found");
-				});
 			})
 		})
-		describe('update()', () => {
+		describe('Testa update', () => {
 			let mocks: any;
 			before(async () => {
 				Sinon
@@ -202,8 +206,16 @@ describe('CONTROLLER LAYER', () => {
 				(carModel.update as Sinon.SinonStub).restore();
 			});
 	
-			describe('SUCESSO', () => {
-				it('Testa se a requisição PUT para a rota /cars/:id retorna status 200',  async ()=> {
+			describe('Testa em caso de sucesso', () => {
+        it('Retorna um objeto', async ()=> {
+          const response = await chai.request(app)
+          .put(`/cars/${mocks[0]._id}`)
+          .send(updatedCar);
+      
+          expect(response.body).to.be.an('object');
+        });
+        
+				it('Testa a rota /cars/:id retorna status(200)',  async ()=> {
 					const response = await chai.request(app)
 						.put(`/cars/${mocks[0]._id}`)
 						.send(updatedCar);
@@ -211,13 +223,6 @@ describe('CONTROLLER LAYER', () => {
 					expect(response.status).to.be.equal(200);
 				});
 		
-				it('Testa se a requisição retorna um objeto', async ()=> {
-					const response = await chai.request(app)
-					.put(`/cars/${mocks[0]._id}`)
-					.send(updatedCar);
-			
-					expect(response.body).to.be.an('object');
-				});
 		
 				it('Testa o objeto tem as propriedades devidas', async ()=> {
 					const response = await chai.request(app)
@@ -225,16 +230,16 @@ describe('CONTROLLER LAYER', () => {
 					.send(updatedCar);
 		
 		
-					expect(response.body).to.have.property('model');
-					expect(response.body).to.have.property('year');
 					expect(response.body).to.have.property('color');
+					expect(response.body).to.have.property('year');
+					expect(response.body).to.have.property('model');
+					expect(response.body).to.have.property('doorsQty');
 					expect(response.body).to.have.property('buyValue');
 					expect(response.body).to.have.property('seatsQty');
-					expect(response.body).to.have.property('doorsQty');
 				});
 			})
-			describe('FALHA', () => {
-				it('Testa se a requisição retorna erro 400 caso o id não tenha formato hexadecimal', async ()=> {
+			describe('Test Error', () => {
+				it('Retorna status(400) caso o id não tenha formato hexadecimal', async ()=> {
 					const response = await chai.request(app)
 					.put(`/cars/1`)
 					.send(updatedCar);
@@ -255,7 +260,7 @@ describe('CONTROLLER LAYER', () => {
 			})
 		})
 	
-		describe('delete()', () => {
+		describe('Testa delete', () => {
 			let mocks: any;
 			before(async () => {
 				Sinon
@@ -277,8 +282,8 @@ describe('CONTROLLER LAYER', () => {
 				(carModel.delete as Sinon.SinonStub).restore();
 			});
 	
-			describe('SUCESSO', () => {
-				it('Testa se a requisição DELETE para a rota /cars/:id retorna status 204',  async ()=> {
+			describe('Teste em caso de sucesso', () => {
+				it('Rota /cars/:id retorna status(204)',  async ()=> {
 					const response = await chai.request(app)
 						.delete(`/cars/${mocks[0]._id}`)
 					
@@ -286,7 +291,7 @@ describe('CONTROLLER LAYER', () => {
 				});
 			})
 	
-			describe('FALHA', () => {
+			describe('Test Error', () => {
 				it('Testa se a requisição retorna erro 400 caso o id não tenha formato hexadecimal', async ()=> {
 					const response = await chai.request(app)
 					.delete(`/cars/1`)		
@@ -306,7 +311,7 @@ describe('CONTROLLER LAYER', () => {
 		})
 	});
 	
-	describe('Testa MotorcycleController', () => {
+	describe('Testa Motorcycle Controller', () => {
 		let motorcycleModel = new MotorcycleModel();
 	
 		const updatedMotorcycle: Motorcycle = {
@@ -317,7 +322,7 @@ describe('CONTROLLER LAYER', () => {
 			"category": 'Street',
 			"engineCapacity": 400
 		}
-		describe('create()', () => {
+		describe('Test create motocycle', () => {
 			it('Testa se a requisição POST para a rota /motorcycles retorna status 201', async ()=> {
 				const response = await chai.request(app)
 				.post('/motorcycles')
@@ -326,7 +331,7 @@ describe('CONTROLLER LAYER', () => {
 				expect(response.status).to.be.equal(201);
 			});
 	
-			it('Testa se a requisição retorna um objeto', async ()=> {
+			it('Retorna um objeto', async ()=> {
 				const response = await chai.request(app)
 				.post('/motorcycles')
 				.send(newMotorcycleMock)
@@ -350,8 +355,8 @@ describe('CONTROLLER LAYER', () => {
 				expect(newCar).to.have.property('_id');
 			});
 		})
-		describe('read()', () => {
-			it('Testa se a requisição GET para a rota /motorcycles retorna status 200', async ()=> {
+		describe('Test read', () => {
+			it('Rota /motorcycles retorna status 200', async ()=> {
 				const response = await chai.request(app)
 				.get('/motorcycles')
 	
@@ -393,7 +398,7 @@ describe('CONTROLLER LAYER', () => {
 			});
 		})
 	
-		describe('readOne()', () => {
+		describe('Test readOne', () => {
 			let motoMocks: any;
 			before(async () => {
 		    Sinon
@@ -415,7 +420,7 @@ describe('CONTROLLER LAYER', () => {
 		    (motorcycleModel.readOne as Sinon.SinonStub).restore();
 		  });
 	
-			describe('SUCESSO', () => {
+			describe('Test sucesso', () => {
 				it('Testa se a requisição GET para a rota /motorcycles/:id retorna status 200',  async ()=> {
 					const response = await chai.request(app)
 						.get(`/motorcycles/${motoMocks[0]._id}`)
@@ -443,7 +448,7 @@ describe('CONTROLLER LAYER', () => {
 					expect(response.body).to.have.property('engineCapacity');
 				});
 			})
-			describe('FALHA', () => {
+			describe('Test Error', () => {
 				it('Testa se a requisição retorna erro 400 caso o id não tenha formato hexadecimal', async ()=> {
 					const response = await chai.request(app)
 					.get(`/motorcycles/1`)
@@ -462,7 +467,7 @@ describe('CONTROLLER LAYER', () => {
 			})
 		});
 
-		describe('update()', () => {
+		describe('Test update', () => {
 			let motoMocks: any;
 			before(async () => {
 		    Sinon
@@ -484,7 +489,7 @@ describe('CONTROLLER LAYER', () => {
 		    (motorcycleModel.update as Sinon.SinonStub).restore();
 		  });
 	
-			describe('SUCESSO', () => {
+			describe('Test sucesso', () => {
 				it('Testa se a requisição PUT para a rota /cars/:id retorna status 200',  async ()=> {
 					const response = await chai.request(app)
 						.put(`/motorcycles/${motoMocks[0]._id}`)
@@ -515,7 +520,7 @@ describe('CONTROLLER LAYER', () => {
 					expect(response.body).to.have.property('engineCapacity');
 				});
 			})
-			describe('FALHA', () => {
+			describe('Test Error', () => {
 				it('Testa se a requisição retorna erro 400 caso o id não tenha formato hexadecimal', async ()=> {
 					const response = await chai.request(app)
 					.put(`/motorcycles/1`)
@@ -559,16 +564,7 @@ describe('CONTROLLER LAYER', () => {
 		    (motorcycleModel.delete as Sinon.SinonStub).restore();
 		  });
 	
-			describe('SUCESSO', () => {
-				it('Testa se a requisição DELETE para a rota /cars/:id retorna status 204',  async ()=> {
-					const response = await chai.request(app)
-						.delete(`/motorcycles/${motoMocks[0]._id}`)
-					
-					expect(response.status).to.be.equal(204);
-				});
-			})
-	
-			describe('FALHA', () => {
+			describe('Test Error', () => {
 				it('Testa se a requisição retorna erro 400 caso o id não tenha formato hexadecimal', async ()=> {
 					const response = await chai.request(app)
 					.delete(`/motorcycles/1`)		
@@ -585,6 +581,16 @@ describe('CONTROLLER LAYER', () => {
 					.equal("Object not found");
 				});
 			})
+			
+			describe('Test sucesso', () => {
+				it('Testa se a requisição DELETE para a rota /cars/:id retorna status 204',  async ()=> {
+					const response = await chai.request(app)
+						.delete(`/motorcycles/${motoMocks[0]._id}`)
+					
+					expect(response.status).to.be.equal(204);
+				});
+			})
+	
 		})
 	});
 })
