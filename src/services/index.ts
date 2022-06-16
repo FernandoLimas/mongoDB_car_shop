@@ -11,6 +11,10 @@ abstract class Service<T> {
   public async create(obj: T): Promise<T | null | ServiceError> {
     return this.model.create(obj);
   }
+
+  public async getAll(): Promise<T[] | ServiceError> {
+    return this.model.read();
+  }
 }
 
 export default Service;
