@@ -1,165 +1,142 @@
-import { Car } from '../../../interfaces/CarInterface';
-import Sinon from 'sinon';
-import { expect } from 'chai';
-import CarsService from '../../../services/CarService';
-import { getAllCarsMock, carMock, newCarMock } from '../helpers/carMock'
+import * as sinon from 'sinon';
+import chai from 'chai';
+import { allCarsMock, invalidNewCarMock, newCarMock, oneCarMock, updatedCarMock } from '../helpers/carMock';
+import CarService from '../../../services/CarService';
 import CarModel from '../../../models/CarModel';
 
+const { expect } = chai;
 
-describe('Test the service Car', () => {
-  let carModel = new CarModel();
-  let carService = new CarsService(carModel);
+const requiredKeys = ["_id", "model", "year", "color", "buyValue", "seatsQty", "doorsQty"];
+const newCarRequiredKeys = ["model", "year", "color", "buyValue", "seatsQty", "doorsQty"];
 
-  describe('testa o create car', () => {
-    before(() => { Sinon
-      .stub(carModel, 'create')
-      .resolves({ ...newCarMock } as Car);
-    });
+describe('Testa camada CarServices', () => {
+  const CAR_ID = '628f7b9ee2be6772f5e86099'
+  let model = new CarModel();
+  let service = new CarService(model);
+  
 
-    after(() => {
-      (carModel.create as Sinon.SinonStub).restore();
-    });
+  describe('Casos de sucesso', () => {
+    describe('Testa se a service getAll()', () => {
+      before(async () => {
+        sinon.stub(model, 'read')
+          .resolves(allCarsMock)
+      })
+      after(() => {
+           sinon.restore();
+          })
+  
+      it('retorna um array', async () => {
+        const response = await service.getAll();
+  
+        expect(response).to.be.an('array');
+        expect(response).to.be.deep.equal(allCarsMock)
+      });
+    })
+  
+    describe('Testa se a service getById()', () => {
+      before(async () => {
+        sinon.stub(model, 'readOne')
+          .resolves(oneCarMock)
+      })
+      after(() => {
+           sinon.restore();
+          })
+  
+      it('retorna um objeto', async () => {
+        const response = await service.getById(CAR_ID);
+  
+        expect(response).to.be.an('object');
+      });
+  
+      it('possue as chaves corretas', async () => {
+        const response = await service.getById(CAR_ID);
+  
+        expect(response).to.be.have.all.keys(requiredKeys);
+      });
+    })
+
+    describe('Testa se a service create()', () => {
+      before(async () => {
+        sinon.stub(model, 'create')
+          .resolves(newCarMock)
+      })
+      after(() => {
+           sinon.restore();
+          })
+  
+      it('retorna um objeto', async () => {
+        const response = await service.create(oneCarMock);
+  
+        expect(response).to.be.an('object');
+      });
+  
+      it('possue as chaves corretas', async () => {
+        const response = await service.create(oneCarMock);
+  
+        expect(response).to.be.have.all.keys(newCarRequiredKeys);
+      });
+    })
+
+    describe('Testa se a service remove()', () => {
+      before(async () => {
+        sinon.stub(model, 'delete')
+          .resolves(oneCarMock)
+      })
+      after(() => {
+           sinon.restore();
+          })
+  
+      it('retorna um objeto', async () => {
+        const response = await service.delete(CAR_ID)
+        
+        expect(response).to.exist;
+      });
+    })
     
-    it('Testa se tem todos os atributos', async () => {
-      const carCreated = await carService.create(newCarMock);
+    describe('Testa se a service update()', () => {
+      before(async () => {
+        sinon.stub(model, 'update')
+          .resolves(updatedCarMock)
+      })
+      after(() => {
+          sinon.restore();
+          })
 
-      expect(carCreated).to.have.property('year');
-      expect(carCreated).to.have.property('buyValue');
-      expect(carCreated).to.have.property('model');
-      expect(carCreated).to.have.property('seatsQty');
-      expect(carCreated).to.have.property('color');
-      expect(carCreated).to.have.property('doorsQty');
-    })
+      it('retorna um objeto', async () => {
+        const response = await service.update(CAR_ID, updatedCarMock)
+        
+        expect(response).to.be.an('object');
+      });
 
-    it('Testa se tem um objeto', async () => {
-      const carCreated = await carService.create(newCarMock);
-
-      expect(carCreated).to.be.an('object');
-    })
-
-  });
-
-  describe('Testa read', () => {
-    before(() => { Sinon
-      .stub(carModel, 'read')
-      .resolves({ ...getAllCarsMock } as Car[]);
-    });
-
-    after(() => {
-      (carModel.read as Sinon.SinonStub).restore();
-    });
-
-    it('Testa se retorna um array', async () => {
-      const getAllCars = await carService.create(newCarMock);
-
-      const allCarsArray = Object.values(getAllCars);
-
-      expect(allCarsArray).to.be.an('array');
-    })
-
-    it('Todos os items do array são objetos', async () => {
-      const getAllCars = await carService.getAll();
-      const allCarsArray = Object.values(getAllCars);
-
-      allCarsArray.forEach((car) => {
-
-        expect(car).to.be.an('object');
+      it('retorna as chaves corretas', async () => {
+        const response = await service.update(CAR_ID, updatedCarMock)
+        
+        expect(response).to.be.deep.equal(updatedCarMock);
       });
     })
+  })
 
-    it('Contém todas propriedades', async () => {
-      const getAllCars = await carService.getAll();
-      const allCarsArray = Object.values(getAllCars);
-      
-
-      allCarsArray.forEach((car) => {
-
-        expect(car).to.have.property('_id');
-        expect(car).to.have.property('model');
-        expect(car).to.have.property('buyValue');
-        expect(car).to.have.property('year');
-        expect(car).to.have.property('color');
-        expect(car).to.have.property('seatsQty');
-        expect(car).to.have.property('doorsQty');
+  describe('Casos de erro', () => {
+    describe('Testa se a service create()', () => {
+      before(async () => {
+        sinon.stub(model, 'create')
+          .resolves()
+      })
+      after(() => {
+           sinon.restore();
+          })
+  
+      it('retorna um objeto', async () => {
+        const response = await service.create(invalidNewCarMock);
+  
+        expect(response).to.be.an('object');
       });
-    });
-  });
-
-  describe('testa readOne', () => {
-    before(() => { Sinon
-      .stub(carModel, 'readOne')
-      .resolves({ ...carMock } as Car);
-    });
-
-    after(() => {
-      (carModel.readOne as Sinon.SinonStub).restore();
-    });
-
-    const mockId = '628fafea3b94a2894ec3f9e7';
-    it('Retorna um objeto', async () => {
-      const showCar = await carService.getById(mockId);
-
-      expect(showCar).to.be.an('object');
+  
+      it('retorna um erro', async () => {
+        const response = await service.create(invalidNewCarMock);
+        
+        expect(response).to.be.have.property('error')
+      });
     })
-
-    it('Testa se o objeto contém todas as propriedades', async () => {
-      const showCar = await carService.getById(mockId);
-
-      expect(showCar).to.have.property('_id');
-      expect(showCar).to.have.property('model');
-      expect(showCar).to.have.property('year');
-      expect(showCar).to.have.property('color');
-      expect(showCar).to.have.property('buyValue');
-      expect(showCar).to.have.property('seatsQty');
-      expect(showCar).to.have.property('doorsQty');
-    })
-  });
-
-  describe('testa update', () => {
-    before(() => { Sinon
-      .stub(carModel, 'update')
-      .resolves({ ...carMock } as Car);
-    });
-
-    after(() => {
-      (carModel.update as Sinon.SinonStub).restore();
-    });
-
-    const mockId = '628fafea3b94a2894ec3f9e7';
-    it('Retorna um objeto', async () => {
-      const showCar = await carService.update(mockId, carMock);
-
-      expect(showCar).to.be.an('object');
-    })
-
-    it('Contain all property', async () => {
-      const showCar = await carService.update(mockId, carMock);
-
-      expect(showCar).to.have.property('model');
-      expect(showCar).to.have.property('year');
-      expect(showCar).to.have.property('seatsQty');
-      expect(showCar).to.have.property('color');
-      expect(showCar).to.have.property('_id');
-      expect(showCar).to.have.property('buyValue');
-      expect(showCar).to.have.property('doorsQty');
-    })
-  });
-
-  describe('testa delete', () => {
-    before(() => { Sinon
-      .stub(carModel, 'delete')
-      .resolves({ ...carMock } as Car);
-    });
-
-    after(() => {
-      (carModel.delete as Sinon.SinonStub).restore();
-    });
-
-    const mockId = '628fafea3b94a2894ec3f9e7';
-    it('Retorna um objeto', async () => {
-      const deleteCar = await carService.delete(mockId);
-
-      expect(deleteCar).to.exist;
-    })
-  });
+  })
 });

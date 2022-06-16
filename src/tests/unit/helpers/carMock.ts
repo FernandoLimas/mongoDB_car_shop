@@ -1,4 +1,4 @@
-export const getAllCarsMock = [
+export const allCarsMock = [
 	{
 		"_id": "628f7b9ee2be6772f5e86099",
 		"model": "Marea Turno",
@@ -46,7 +46,7 @@ export const newCarMock = {
   "doorsQty": 4
 }
 
-export const carMock = {
+export const oneCarMock = {
   "_id": "628fafea3b94a2894ec3f9e7",
   "model": "Marea Turno",
   "year": 1995,
@@ -54,4 +54,36 @@ export const carMock = {
   "buyValue": 17000,
   "seatsQty": 4,
   "doorsQty": 4
+}
+
+export const updatedCarMock = {
+  "_id": "628fafea3b94a2894ec3f9e7",
+  "model": "Marea Turno",
+  "year": 1995,
+  "color": "green",
+  "buyValue": 17000,
+  "seatsQty": 4,
+  "doorsQty": 4
+}
+
+export const invalidNewCarMock = {
+  "model": "",
+  "year": 0,
+  "color": "",
+  "buyValue": 0,
+  "seatsQty": 0,
+  "doorsQty": 0
+}
+
+export const carToUpdateMock = {
+	"model": "Marea Turno",
+  "year": 1995,
+  "color": "green",
+  "buyValue": 17000,
+  "seatsQty": 4,
+  "doorsQty": 4
+}
+
+export const carNotFound = {
+	message: "car"
 }
