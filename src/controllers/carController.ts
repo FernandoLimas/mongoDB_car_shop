@@ -29,6 +29,20 @@ class CarController extends Controller<Car> {
 
     return res.status(201).json(newCar);
   };
+
+  public getAll = async (
+    _req: RequestWithBody<Car>,
+    res: Response<Car[] | ResponseError>,
+  ): Promise<typeof res> => {
+    const getAllCars = await this.service.getAll();
+    if (!getAllCars) {
+      return res.status(400).json({ error: this.errors.badRequest });
+    }
+    
+    if ('error' in getAllCars) return res.status(400).json(getAllCars);
+    
+    return res.status(200).json(getAllCars);
+  };
 }
 
 export default CarController;
