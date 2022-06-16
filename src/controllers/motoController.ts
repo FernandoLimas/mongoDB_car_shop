@@ -49,9 +49,9 @@ class MotoController extends Controller<Motorcycle> {
     res: Response<Motorcycle | ResponseError>,
   ): Promise<typeof res> => {
     const { id } = req.params;
-    const hex = /[0-9A-Fa-f]{24}/g;
+    const charRequired = /[0-9A-f]{24}/g;
 
-    if (!hex.test(id)) {
+    if (!charRequired.test(id)) {
       return res.status(400)
         .json({ error: this.errors.requiredId });
     }
@@ -70,9 +70,9 @@ class MotoController extends Controller<Motorcycle> {
   ): Promise<typeof res> => {
     const { id } = req.params;
 
-    const hex = /[0-9A-Fa-f]{24}/g;
+    const charRequired = /[0-9A-f]{24}/g;
 
-    if (!hex.test(id)) {      
+    if (!charRequired.test(id)) {      
       return res.status(400)
         .json({ error: this.errors.requiredId });
     }
@@ -96,20 +96,23 @@ class MotoController extends Controller<Motorcycle> {
     res: Response<Motorcycle | ResponseError>,
   ): Promise<typeof res> => {
     const { id } = req.params;
-    const hex = /[0-9A-Fa-f]{24}/g;
+    const charRequired = /[0-9A-f]{24}/g;
 
-    if (!hex.test(id)) {      
+    if (!charRequired.test(id)) {      
       return res.status(400)
         .json({ error: this.errors.requiredId });
     }
 
-    const removedMoto = await this.service.delete(id);
-
-    if (!removedMoto) {
-      return res.status(404).json({ error: this.errors.notFound });
-    }
+    const deleteMoto = await this.service.delete(id);
     
-    return res.status(204).json(removedMoto);
+    return deleteMoto
+      ? res.status(204).json()
+      : res.status(404).json({ error: this.errors.notFound });
+    // if (!deleteMoto) {
+    //   return res.status(404).json({ error: this.errors.notFound });
+    // }
+    
+    // return res.status(204).json(deleteMoto);
   };
 }
 

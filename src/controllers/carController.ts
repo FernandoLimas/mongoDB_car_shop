@@ -104,10 +104,11 @@ class CarController extends Controller<Car> {
     }
 
     const deleteCar = await this.service.delete(id);
-
+    
     if (!deleteCar) {
       return res.status(404).json({ error: this.errors.notFound });
     }
+
     return res.status(204).json(deleteCar);
   };
 }
