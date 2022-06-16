@@ -43,6 +43,29 @@ class CarController extends Controller<Car> {
     
     return res.status(200).json(getAllCars);
   };
+
+  public getById = async (
+    req: RequestWithBody<Car>,
+    res: Response<Car | ResponseError>,
+  ): Promise<typeof res> => {
+    const { id } = req.params;
+    const charRequired = /[0-9A-f]{24}/g.test(id);
+
+    if (!charRequired) {
+      return res.status(400)
+        .json({ error: this.errors.requiredId });
+    }
+
+    try {
+      const car = await this.service.getById(id);
+
+      return car
+        ? res.json(car)
+        : res.status(404).json({ error: this.errors.notFound });
+    } catch (error) {
+      return res.status(500).json({ error: this.errors.internal });
+    }
+  };
 }
 
 export default CarController;
