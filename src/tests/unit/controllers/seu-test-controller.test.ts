@@ -1,10 +1,10 @@
 import Sinon from 'sinon';
-import chai from 'chai';
-import chaiHttp = require('chai-http');
-import server from '../../../server';
 import mongoose from 'mongoose';
+import chaiHttp = require('chai-http');
+import chai from 'chai';
+import server from '../../../server';
 import { Car } from '../../../interfaces/CarInterface';
-import { allCarsMock, oneCarMock, newCarMock } from '../helpers/carMock'
+import { carMock, newCarMock } from '../helpers/carMock'
 import CarModel from '../../../models/CarModel';
 import MotorcycleModel from '../../../models/MotoModel';
 import { Motorcycle } from '../../../interfaces/MotorcycleInterface';
@@ -118,7 +118,7 @@ describe('CONTROLLER LAYER', () => {
 				Sinon
 				.stub(carModel, 'readOne')
 				.resolves({
-					...oneCarMock,
+					...carMock,
 				} as Car);
 	
 				await chai.request(app)
@@ -186,7 +186,7 @@ describe('CONTROLLER LAYER', () => {
 				Sinon
 				.stub(carModel, 'update')
 				.resolves({
-					...oneCarMock,
+					...carMock,
 				} as Car);
 	
 				await chai.request(app)
@@ -261,7 +261,7 @@ describe('CONTROLLER LAYER', () => {
 				Sinon
 				.stub(carModel, 'delete')
 				.resolves({
-					...oneCarMock,
+					...carMock,
 				} as Car);
 	
 				await chai.request(app)
