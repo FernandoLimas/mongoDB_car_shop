@@ -27,6 +27,9 @@ abstract class Controller<T> {
     req: RequestWithBody<T>,
     res: Response<T | ResponseError>,
   ): Promise<typeof res>;
+
+  abstract getAll(
+    req: Request, res: Response<T[] | ResponseError>): Promise<typeof res>;
 }
 
 export default Controller;
