@@ -87,3 +87,8 @@ export const carToUpdateMock = {
 export const carNotFound = {
 	message: "car"
 }
+
+export const carNotFoundId = {
+	message: "car",
+	id: "628f7b9ee2be6772f5e86099"
+}
