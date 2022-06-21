@@ -2,7 +2,7 @@ import { Model as M } from 'mongoose';
 import { Model } from '../interfaces/ModelInterface';
 
 export default abstract class MongoModel<T> implements Model<T> {
-  constructor(protected model: M<T>) {}
+  constructor(public model: M<T>) {}
 
   create = async (obj: T): Promise<T> => this.model.create({ ...obj });
 
