@@ -34,7 +34,7 @@ services:
 
   # Serviço que irá rodar o mongodb
   mongodb:
-    image: mongo:5.0.7
+    image: mongo:5.0.7 # mongo:4.4.8
     container_name: car_shop_db
     volumes:
       - ./:/app
