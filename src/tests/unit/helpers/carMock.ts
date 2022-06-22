@@ -57,7 +57,6 @@ export const oneCarMock = {
 }
 
 export const updatedCarMock = {
-  "_id": "628fafea3b94a2894ec3f9e7",
   "model": "Marea Turno",
   "year": 1995,
   "color": "green",
@@ -76,7 +75,7 @@ export const invalidNewCarMock = {
 }
 
 export const carToUpdateMock = {
-	"model": "Marea Turno",
+  "model": "Marea Turno",
   "year": 1995,
   "color": "green",
   "buyValue": 17000,

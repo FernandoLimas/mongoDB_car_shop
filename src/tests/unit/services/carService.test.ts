@@ -3,11 +3,11 @@ import MotoService from "../../../services/MotoService";
 import { expect } from "chai";
 import { allCarsMock, oneCarMock, newCarMock } from "../helpers/carMock";
 import { oneMotorcycleMock, newMotorcycleMock } from "../helpers/motoMock";
-import Sinon from "sinon";
+import Sinon, { SinonStub } from "sinon";
 
 describe('Test CarService', () => {
+    const modelcar = new CarService();
     describe('should create new car', () => {
-        const modelcar = new CarService();
 
         before(() => {
             Sinon.stub(modelcar, "create").resolves(oneCarMock);
@@ -15,7 +15,7 @@ describe('Test CarService', () => {
         })
 
         after(() => {
-            Sinon.restore();
+            (modelcar.create as SinonStub).restore();
         })
 
         it('should create new car', async () => {
@@ -27,6 +27,20 @@ describe('Test CarService', () => {
 
     })
 
-    
+    describe('read', () => {
+                before(() => {
+                  Sinon.stub(modelcar, 'getAll').resolves(allCarsMock);
+                });
+            
+                after(() => {
+                  Sinon.restore();
+                });
+            
+                it('should return array', async () => {
+                  const carsFound = await modelcar.getAll();
+                  expect(carsFound).to.be.an('array');
+                  expect(carsFound).to.deep.equal(allCarsMock);
+                });
+              });
 
 })
