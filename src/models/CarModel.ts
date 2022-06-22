@@ -7,6 +7,7 @@ const carSchema = new Schema<Car>(
     model: String,
     year: Number,
     color: String,
+    status: Boolean,
     buyValue: Number,
     doorsQty: Number,
     seatsQty: Number,
