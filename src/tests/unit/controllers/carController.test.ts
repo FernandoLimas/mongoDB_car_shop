@@ -154,5 +154,56 @@ describe('Test carController', () => {
           return res.body;
       });
     });
+
+    it('should return status 400', async () => {
+      chaiHttpResponse = await chai
+        .request(app)
+        .put(`/cars/${oneCarMock._id}`)
+        .send({})
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.have.property('error');
+          return res.body;
+        });
+    });
+  });
+
+  describe('request delete', () => {
+    let carModel = new CarModel();
+    let chaiHttpResponse: Response;
+    let app = server.getApp();
+  
+    before(() => {
+      sinon.stub(carModel.model, 'remove').resolves(oneCarMock as any);
+    });
+  
+    after(() => {
+      sinon.restore();
+    });
+  
+    it('should return status 204 and an object', async () => {
+      chaiHttpResponse = await chai
+        .request(app)
+        .delete(`/cars/${oneCarMock._id}`)
+        .then(res => {
+          expect(res).to.have.status(204);
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.be.deep.equal({});
+          return res.body;
+      });
+    });
+
+    it('should return status 400', async () => {
+      chaiHttpResponse = await chai
+        .request(app)
+        .delete(`/cars/123`)
+        .then(res => {
+          expect(res).to.have.status(400);
+          expect(res.body).to.be.an('object');
+          expect(res.body).to.have.property('error');
+          return res.body;
+        });
+    });
   });
 })
